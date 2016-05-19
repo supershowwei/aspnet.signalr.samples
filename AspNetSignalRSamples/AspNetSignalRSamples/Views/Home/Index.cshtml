@@ -1,7 +1,78 @@
 ﻿
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Broadcast";
 }
 
-<h2>Index</h2>
+<h2>Broadcast</h2>
+<p>
+    <input type="text" class="form-control" placeholder="Name" id="name" />
+</p>
+<p>
+    <input type="text" class="form-control" placeholder="Message" id="message" />
+</p>
+<p>
+    <input type="button" class="btn btn-default" id="sendmessage" value="向大家問好" />
+</p>
+<p>
+    <ul id="messages"></ul>
+</p>
+@section scripts {
+    <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(function () {
+            // Without the generated proxy
+            //var connection = $.hubConnection();
+            //var punchHub = connection.createHubProxy('punchHub');
 
+            //punchHub.on('hello', function (name) {
+            //    $('#discussion').append('<li><strong>' + htmlEncode(name) + '</strong>: 大家好！</li>');
+            //});
+
+            //punchHub.on('hello', function (name, age) {
+            //    alert(name + ', ' + age);
+            //});
+
+            //punchHub.on('punched', function () {
+            //    $('#discussion').append('<li><strong>Punched !!</strong></li>');
+            //});
+
+            //connection.start()
+            //    .done(function () { // 與
+            //        $('#sendmessage').click(function () {
+            //            // Call the Send method on the hub.
+            //            punchHub.invoke('hello', 'Johnny');
+            //        });
+
+            //        $('#workButton').click(function () {
+            //            punchHub.invoke('punch');
+            //        });
+            //    });
+
+            // With the generated proxy
+            // 宣告 SignalR Hub
+            var punchHub = $.connection.broadcastHub;
+
+            // 宣告 Client 端可以被 Server 呼叫的方法
+            punchHub.client.showmessage = function (name, message) {
+                // Add the message to the page.
+                $('#messages').append('<li><strong>' + htmlEncode(name) + '</strong>: ' + htmlEncode(message) + '</li>');
+            };
+
+            // 開始與 SignalR 伺服器連線
+            $.connection.hub.start()
+                .done(function () { // 與
+                    $('#sendmessage').click(function () {
+                        // Call the Send method on the hub.
+                        punchHub.server.broadcast($('#name').val(), $('#message').val());
+                    });
+                });
+
+        });
+
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        }
+    </script>
+}
