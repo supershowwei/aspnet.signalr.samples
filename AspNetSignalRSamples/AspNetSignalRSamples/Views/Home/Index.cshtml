@@ -21,53 +21,42 @@
     <script src="~/signalr/hubs"></script>
     <script>
         $(function () {
-            // Without the generated proxy
-            //var connection = $.hubConnection();
-            //var punchHub = connection.createHubProxy('punchHub');
-
-            //punchHub.on('hello', function (name) {
-            //    $('#discussion').append('<li><strong>' + htmlEncode(name) + '</strong>: 大家好！</li>');
-            //});
-
-            //punchHub.on('hello', function (name, age) {
-            //    alert(name + ', ' + age);
-            //});
-
-            //punchHub.on('punched', function () {
-            //    $('#discussion').append('<li><strong>Punched !!</strong></li>');
-            //});
-
-            //connection.start()
-            //    .done(function () { // 與
-            //        $('#sendmessage').click(function () {
-            //            // Call the Send method on the hub.
-            //            punchHub.invoke('hello', 'Johnny');
-            //        });
-
-            //        $('#workButton').click(function () {
-            //            punchHub.invoke('punch');
-            //        });
-            //    });
-
             // With the generated proxy
-            // 宣告 SignalR Hub
-            var punchHub = $.connection.broadcastHub;
+            // Create Hub Proxy
+            var broadcastHub = $.connection.broadcastHub;
 
-            // 宣告 Client 端可以被 Server 呼叫的方法
-            punchHub.client.showmessage = function (name, message) {
-                // Add the message to the page.
+            // 註冊給伺服端呼叫的方法
+            broadcastHub.client.showmessage = function (name, message) {
                 $('#messages').append('<li><strong>' + htmlEncode(name) + '</strong>: ' + htmlEncode(message) + '</li>');
             };
 
-            // 開始與 SignalR 伺服器連線
+            // 連線到 SignalR 伺服器
             $.connection.hub.start()
-                .done(function () { // 與
+                .done(function () {
+                    // 註冊連線成功後要執行的作業
                     $('#sendmessage').click(function () {
-                        // Call the Send method on the hub.
-                        punchHub.server.broadcast($('#name').val(), $('#message').val());
+                        broadcastHub.server.broadcast($('#name').val(), $('#message').val());
                     });
                 });
 
+            // Without the generated proxy
+            //// Create Hub Proxy
+            //var connection = $.hubConnection();
+            //var broadcastHub = connection.createHubProxy('broadcastHub');
+
+            //// 註冊給伺服端呼叫的方法
+            //broadcastHub.on('showmessage', function (name, message) {
+            //    $('#messages').append('<li><strong>' + htmlEncode(name) + '</strong>: ' + htmlEncode(message) + '</li>');
+            //});
+
+            //// 連線到 SignalR 伺服器
+            //connection.start()
+            //    .done(function () {
+            //        // 註冊連線成功後要執行的作業
+            //        $('#sendmessage').click(function () {
+            //            broadcastHub.invoke('broadcast', $('#name').val(), $('#message').val());
+            //        });
+            //    });
         });
 
         function htmlEncode(value) {

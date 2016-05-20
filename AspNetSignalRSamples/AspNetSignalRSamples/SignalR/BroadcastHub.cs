@@ -12,5 +12,10 @@ namespace AspNetSignalRSamples.SignalR
         {
             Clients.All.showmessage(name, message);
         }
+
+        public void CallHello()
+        {
+            Clients.All.hello("Johnny", 28);
+        }
     }
 }
